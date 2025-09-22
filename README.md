@@ -73,7 +73,7 @@ Prototype Views:
 ## Model Architecture
 - Anti-Spoofing: DualInputCNN model with RGB and LBP image branches
 - Face Recognition: InceptionResNetV1 pretrained on VGGFace2
-- Uses Euclidean distance to compare embeddings with a defined threshold (e.g., 0.7)
+- Uses Euclidean distance to compare embeddings with a defined threshold (e.g., 0.8)
 
 ## Dataset
 - Anti-spoofing: nguyenkhoa/antispoofing-3 (using only 10.000 data)
@@ -82,10 +82,10 @@ Prototype Views:
 
 ## Results and Evaluation
 - Face Detection: yields F1-score = 1.0
-- Face Recognition: Best threshold at 0.7 yields F1-score = 0.964
-- Anti-Spoofing Accuracy: 77,8% using "nguyenkhoa/antispoofing-3" dataset
-- Security: FAR = 0%, FRR = 6.7%
-- Performance: Average system response time ≈ 9.26 seconds
+- Face Recognition: Best threshold at 0.8 yields F1-score = 0.87
+- Anti-Spoofing Accuracy: 82.4% using "nguyenkhoa/antispoofing-3" dataset
+- Security: FAR = 9.1%, FRR = 10.5%
+- Performance: Average system response time ≈ 1.494 seconds
 
 ## Future Work
 - Integrate Vision Transformer (ViT) with DINO pretraining for better spoofing resistance
