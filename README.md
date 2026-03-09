@@ -1,105 +1,244 @@
-# [Prototype] SDLock v0.1
+# 🚪 Smart Door Lock — Face Recognition System
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python" />
+  <img src="https://img.shields.io/badge/Raspberry%20Pi-4B-red?logo=raspberrypi" />
+  <img src="https://img.shields.io/badge/Framework-PyTorch-orange?logo=pytorch" />
+  <img src="https://img.shields.io/badge/Architecture-Client--Server-green" />
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
+</p>
+
+<p align="center">
+  <strong>Design and Development of a Smart Door Lock System Based on Face Recognition Using MTCNN-InceptionResNet</strong><br/>
+  <em>Undergraduate Thesis — Robotics and Artificial Intelligence Engineering, Universitas Airlangga (2025)</em>
+</p>
+
 ---
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Features](#features)
-3. [Installation](#installation)
-4. [Usage](#usage)
-5. [System Design](#system-design)
-6. [Model Architecture](#model-architecture)
-7. [Dataset](#dataset)
-8. [Results and Evaluation](#results-and-evaluation)
-9. [Future Work](#future-work)
-10. [Contributing](#contributing)
-11. [License](#license)
-12. [Contact](#contact)
+
+## 📖 Overview
+
+This project presents a **face recognition-based smart door lock** system that replaces traditional key-based access with biometric authentication. The system integrates:
+
+- **MTCNN** for robust multi-scale face detection under varying lighting conditions
+- **InceptionResNetV1** (via FaceNet-PyTorch) for face embedding and recognition
+- **DualInputCNN** — a custom anti-spoofing model combining RGB image features and Local Binary Pattern (LBP) descriptors
+
+The system runs on a **Raspberry Pi 4 Model B** using a **client-server architecture**, offloading inference to a Google Colab-based server to overcome local computational limits.
+
+> 📄 **Paper/Thesis**: [[arXiv link — coming soon]](https://arxiv.org) | [Universitas Airlangga Repository](https://repository.unair.ac.id)
+
 ---
-## Introduction
-<p align="justify">
-This project presents a smart door lock system based on facial recognition. It uses MTCNN for face detection and InceptionResNetV1 for feature embedding. A custom anti-spoofing model named DualInputCNN enhances security by verifying face authenticity using both RGB and LBP image inputs.
-</p>
 
-## Features
-- Real-time face detection and recognition
-- Anti-spoofing to prevent fake face attacks
-- Threshold-based Euclidean distance for identity verification
-- Servo motor control for lock/unlock mechanism
-- Integrated with Raspberry Pi and webcam
-- Remote access via Flask API hosted on Google Colab
+## 🏗️ System Architecture
 
-## Installation
-- Clone this repository
-- Download the DualInputCNN model from this repo: [AlvinOctaH/DualInputCNN](https://huggingface.co/AlvinOctaH/DualInputCNN)
-- Mount your Google Drive in Colab
-- Run colab_face_recognition.ipynb to start the Flask server
-- Connect Raspberry Pi to the internet and run:
-  - raspberry_pi_register_face.py to register users
-  - raspberry_pi_face_recognition.py to perform recognition and unlock the door
+```
+┌─────────────────────────┐          ┌──────────────────────────────┐
+│     Raspberry Pi 4B     │          │    Server (Google Colab)     │
+│                         │          │                              │
+│  Webcam (Logitech C922) │          │  ┌─────────────────────────┐ │
+│         ↓               │  HTTP    │  │ 1. MTCNN Face Detection  │ │
+│  Capture Frame          │ ───────► │  │ 2. Anti-Spoofing (CNN)   │ │
+│         ↓               │          │  │ 3. InceptionResNetV1     │ │
+│  REST API Request       │ ◄─────── │  │    (Face Recognition)    │ │
+│         ↓               │  JSON    │  └─────────────────────────┘ │
+│  Servo Motor (SG90)     │          └──────────────────────────────┘
+│  → Unlock Door          │
+└─────────────────────────┘
+```
 
-## Usage
-- Register face images via the Raspberry Pi script
-- When a user is in front of the camera, the system:
-  - Detects the face using MTCNN
-  - Verifies liveness using anti-spoofing model
-  - Extracts facial features with InceptionResNetV1
-  - Compares against stored embeddings using Euclidean distance
-  - Unlocks door via servo motor if identity is verified
+---
 
-## System Design
-The system consists of hardware and software components designed to operate together through REST API communication. The lock mechanism is driven by an SG90 servo motor, controlled by a Raspberry Pi, and integrated with a webcam to capture facial images.
-- The physical design includes a 3D-printed prototype
-- All wiring and layout are integrated into a compact and functional housing
+## 📊 Key Results
 
-Prototype Views:
-- Front, side, and bottom views of the device
-<p align="center">
-  <img width="480" height="360" src="https://raw.githubusercontent.com/AlvinOctaH/SDLockV0.1/main/assets/Imp1.jpg" alt="Front view of the device">
-  <img width="480" height="360" src="https://raw.githubusercontent.com/AlvinOctaH/SDLockV0.1/main/assets/Imp2.jpg" alt="Bottom view of the device">
-  <img width="480" height="360" src="https://raw.githubusercontent.com/AlvinOctaH/SDLockV0.1/main/assets/Imp3.jpg" alt="Side view of the device">
-</p>
+| Component | Metric | Value |
+|-----------|--------|-------|
+| **Face Detection (MTCNN)** | Precision / Recall / F1-score | **1.0 / 1.0 / 1.0** (all 4 lighting conditions) |
+| **Face Recognition (InceptionResNetV1)** | Average FAR | 9.1% (threshold = 0.8) |
+| **Face Recognition (InceptionResNetV1)** | Average FRR | 10.5% (threshold = 0.8) |
+| **Anti-Spoofing (DualInputCNN)** | Accuracy on test dataset | 82.4% |
+| **System Response Time** | Avg. end-to-end latency | 1.494 seconds @ 23.49 Mbps |
 
-- Wiring schematic of the smart door lock
-<p align="center">
-  <img width="480" height="360" src="https://raw.githubusercontent.com/AlvinOctaH/SDLockV0.1/main/assets/Imp4.png" alt="Wiring schematic of the device">
-</p>
+---
 
-- Exploded View, 3D Assembly, and Technical Drawing of the SDLock v0.1 System
-<p align="center">
-  <img width="480" height="360" src="https://raw.githubusercontent.com/AlvinOctaH/SDLockV0.1/main/assets/Imp5.png" alt="Exploded view of the device">
-  <img width="480" height="360" src="https://raw.githubusercontent.com/AlvinOctaH/SDLockV0.1/main/assets/Imp6.jpg" alt="3D Assembly">
-  <img width="480" height="360" src="https://raw.githubusercontent.com/AlvinOctaH/SDLockV0.1/main/assets/Imp7.jpg" alt="Technical Drawing">
-</p>
+## 🔬 Models
 
-## Model Architecture
-- Anti-Spoofing: DualInputCNN model with RGB and LBP image branches
-- Face Recognition: InceptionResNetV1 pretrained on VGGFace2
-- Uses Euclidean distance to compare embeddings with a defined threshold (e.g., 0.8)
+### 1. Face Detection — MTCNN
+Multi-Task Cascaded Convolutional Neural Network with three stages (P-Net, R-Net, O-Net) for face detection and facial landmark alignment. Selected over BlazeFace, SSD, and YOLO for its superior accuracy in challenging lighting conditions.
 
-## Dataset
-- Anti-spoofing: nguyenkhoa/antispoofing-3 (using only 10.000 data)
-- Custom webcam images for finetuning anti-spoofing (190 data)
-- Face recognition images registered manually via Raspberry Pi
+### 2. Face Recognition — InceptionResNetV1
+Pre-trained model from the [facenet-pytorch](https://github.com/timesler/facenet-pytorch) library (VGGFace2 weights). Produces 512-dimensional face embeddings, compared via Euclidean distance at threshold `0.8`.
 
-## Results and Evaluation
-- Face Detection: yields F1-score = 1.0
-- Face Recognition: Best threshold at 0.8 yields F1-score = 0.87
-- Anti-Spoofing Accuracy: 82.4% using "nguyenkhoa/antispoofing-3" dataset
-- Security: FAR = 9.1%, FRR = 10.5%
-- Performance: Average system response time ≈ 1.494 seconds
+### 3. Anti-Spoofing — DualInputCNN
+A custom CNN model with dual inputs:
+- **RGB branch**: captures color and texture features
+- **LBP branch**: extracts local texture descriptors for liveness detection
 
-## Future Work
-- Integrate Vision Transformer (ViT) with DINO pretraining for better spoofing resistance
-- Add channel attention mechanism to enhance anti-spoofing
-- Apply quantization and pruning for efficient edge deployment
+Trained on `nguyenkhoa/antispoofing-3` dataset (~104,000 images) and fine-tuned on primary webcam data.
 
-## Contributing
-Contributions are welcome. Please open issues and pull requests to collaborate or improve the system.
+**DualInputCNN Architecture:**
 
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+| Layer | Details |
+|-------|---------|
+| Input (RGB) | 160×160×3 |
+| Input (LBP) | 160×160×1 |
+| Conv blocks | 3× (Conv2D + BatchNorm + MaxPool) |
+| Fusion | Concatenate + Dense layers |
+| Output | Sigmoid (real / spoof) |
 
-## Contact
-Author: Alvin Octa Hidayathullah
-Email: alvinhidayatullah94@gmail.com
-GitHub: https://github.com/AlvinOctaH
-LinkedIn: www.linkedin.com/in/alvin-octa-hidayathullah
+Training parameters: Adam optimizer, lr=0.0001, dropout=0.3, max 200 epochs, patience=20.
+
+---
+
+## 🛠️ Hardware Requirements
+
+| Component | Specification |
+|-----------|--------------|
+| **Edge Device** | Raspberry Pi 4 Model B (4GB RAM) |
+| **Camera** | Logitech C922 Pro HD Stream Webcam (1080p@30fps) |
+| **Actuator** | TowerPro SG90 Servo Motor |
+| **Connectivity** | LAN Cat 6 / WiFi |
+| **Storage** | MicroSDHC |
+
+---
+
+## 💻 Software Requirements
+
+```
+Python 3.8+
+torch >= 1.9.0
+facenet-pytorch
+opencv-python
+numpy
+flask            # for REST API server
+RPi.GPIO         # for Raspberry Pi GPIO control
+```
+
+---
+
+## 📂 Repository Structure
+
+```
+SDLockV0.1/
+│
+├── src/
+│   ├── train_model_anti_spoofing.ipynb      # Anti-spoofing model training (Google Colab)
+│   ├── colab_face_recognition.ipynb         # Main inference server (Google Colab)
+│   ├── raspberry_pi_register_face.py        # Face enrollment script (Raspberry Pi)
+│   └── raspberry_pi_face_recognition.py    # Main door lock script (Raspberry Pi)
+│
+├── models/
+│   └── dual_input_cnn_finetuned.pth         # Trained anti-spoofing model weights
+│
+├── docs/
+│   ├── system_architecture.png
+│   └── wiring_diagram.png
+│
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/AlvinOctaH/SDLockV0.1.git
+cd SDLockV0.1
+```
+
+### 2. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Set up the inference server (Google Colab)
+Open `src/colab_face_recognition.ipynb` in Google Colab, run all cells, and copy the **ngrok public URL** for the API endpoint.
+
+### 4. Register a face
+```bash
+# On Raspberry Pi
+python src/raspberry_pi_register_face.py --name "YourName"
+```
+
+### 5. Run the door lock system
+```bash
+# On Raspberry Pi
+python src/raspberry_pi_face_recognition.py --server-url "https://YOUR-NGROK-URL"
+```
+
+---
+
+## 🧪 Evaluation
+
+The system was evaluated across **four lighting conditions**:
+- Dim indoor (10–50 lux)
+- Normal indoor (100–300 lux)
+- Outdoor daylight (1,000–2,000 lux)
+- Late afternoon (640–1,000 lux)
+
+Additional tests include:
+- Face recognition with accessories (glasses, masks, hats)
+- Spoofing resistance (printed photos & smartphone screen)
+- Partial face occlusion detection
+- Black box feature testing
+
+---
+
+## ⚠️ Known Limitations
+
+- Anti-spoofing fails on high-quality face images displayed on smartphone screens (70% detection rate in real-world testing)
+- Face recognition accuracy degrades when facial features are occluded (e.g., sunglasses, full mask)
+- System depends on stable internet connection for server inference; higher latency at lower speeds
+
+---
+
+## 🔮 Future Work
+
+- [ ] Integrate pre-trained anti-spoofing models: **MobileNetV3-based CDCN**, **DINO-ViT**, or **CDCN++**
+- [ ] Add spatio-temporal features to improve liveness detection against video replay attacks
+- [ ] Evaluate **LVFace** (ViT-based Progressive Cluster Optimization) for face recognition
+- [ ] Deploy fully local inference on **Raspberry Pi 5 + AI Kit** or **NVIDIA Jetson Orin Nano**
+- [ ] Expand test dataset with more accessory and pose variations
+
+---
+
+## 📚 Citation
+
+If you use this work, please cite:
+
+```bibtex
+@misc{hidayathullah2025smartdoorlock,
+  author    = {Alvin Octa Hidayathullah},
+  title     = {Design and Development of a Smart Door Lock System Based on Face Recognition Using MTCNN-InceptionResNet},
+  year      = {2025},
+  school    = {Universitas Airlangga},
+  note      = {Undergraduate Thesis},
+  url       = {https://github.com/AlvinOctaH/SDLockV0.1}
+}
+```
+
+---
+
+## 👤 Author
+
+**Alvin Octa Hidayathullah**  
+S1 Teknik Robotika dan Kecerdasan Buatan  
+Fakultas Teknologi Maju dan Multidisiplin, Universitas Airlangga  
+📧 *(add your email here)*  
+🔗 [LinkedIn](https://linkedin.com) | [GitHub](https://github.com/AlvinOctaH)
+
+---
+
+## 🙏 Acknowledgements
+
+- **Amila Sofiah, S.T., M.T.** — Supervisor I
+- **Dr. Maryamah, S.Kom.** — Supervisor II
+- [facenet-pytorch](https://github.com/timesler/facenet-pytorch) by Timothy Esler
+- Dataset: [nguyenkhoa/antispoofing-3](https://huggingface.co/datasets/nguyenkhoa/antispoofing-3) on Hugging Face
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
