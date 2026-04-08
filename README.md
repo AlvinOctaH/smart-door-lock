@@ -31,7 +31,7 @@ A face recognition-based smart door lock system that replaces traditional key-ba
 *3D-printed enclosure housing Raspberry Pi 4B, SG90 servo motor, and Logitech C922 webcam.*
 
 ### System Design
-| CAD & Technical Drawing | 3D Render on Wall |
+| CAD & Technical Drawing | 3D Render on Door|
 |---|---|
 | ![Technical Drawing](assets/technical_drawing.jpg) | ![System Render](assets/system_render.jpg) |
 
