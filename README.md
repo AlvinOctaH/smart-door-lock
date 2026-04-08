@@ -31,7 +31,7 @@ A face recognition-based smart door lock system that replaces traditional key-ba
 *3D-printed enclosure housing Raspberry Pi 4B, SG90 servo motor, and Logitech C922 webcam.*
 
 ### System Design
-| CAD & Technical Drawing | 3D Render on Door|
+| CAD & Technical Drawing | 3D Render on Door |
 |---|---|
 | ![Technical Drawing](assets/technical_drawing.jpg) | ![System Render](assets/system_render.jpg) |
 
@@ -66,7 +66,7 @@ A face recognition-based smart door lock system that replaces traditional key-ba
 │    time.sleep(5) → back to 0°  │         └─────────────────────────────────────┘
 └─────────────────────────────────┘
          ↕
-    config.txt
+    config.txt (optional)
   (ngrok public URL)
 ```
 
@@ -150,12 +150,6 @@ pip install facenet-pytorch flask pyngrok scikit-image torch torchvision pillow 
 pip install opencv-python requests pigpio
 ```
 
-Or install all at once:
-
-```bash
-pip install -r requirements.txt
-```
-
 ---
 
 ## Project Structure
@@ -174,8 +168,6 @@ smart-door-lock/
 │   ├── exploded_view.png                    # Labelled component exploded view
 │   ├── wiring_diagram.png                   # Raspberry Pi GPIO wiring
 │   └── demo_recognition.gif                 # Live recognition demo
-├── config.txt                               # Stores ngrok public URL (update each session)
-├── requirements.txt
 └── README.md
 ```
 
